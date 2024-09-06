@@ -1,0 +1,11 @@
+services:
+  shell:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    cap_add:
+      - SYS_ADMIN
+    security_opt:
+      - seccomp:unconfined
+    privileged: true
+    tty: true

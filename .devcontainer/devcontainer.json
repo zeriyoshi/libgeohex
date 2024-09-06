@@ -1,0 +1,17 @@
+{
+  "name": "GitHub Codespaces",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cpptools",
+        "ms-vscode.cpptools-extension-pack",
+        "ms-vscode.cmake-tools",
+        "ms-azuretools.vscode-docker",
+        "editorconfig.editorconfig",
+        "markis.code-coverage"
+      ]
+    }
+  },
+  "dockerComposeFile": "./../compose.yaml",
+  "service": "shell"
+}

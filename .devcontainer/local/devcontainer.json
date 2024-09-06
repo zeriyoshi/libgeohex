@@ -1,0 +1,21 @@
+{
+  "name": "Local VSCode",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cpptools",
+        "ms-vscode.cpptools-extension-pack",
+        "ms-vscode.cmake-tools",
+        "ms-azuretools.vscode-docker",
+        "editorconfig.editorconfig",
+        "markis.code-coverage"
+      ]
+    }
+  },
+  "dockerComposeFile": "./../../compose.yaml",
+  "service": "shell",
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/workspaces/libgeohex,type=bind,consistency=cached"
+  ],
+  "workspaceFolder": "/workspaces/libgeohex"
+}
