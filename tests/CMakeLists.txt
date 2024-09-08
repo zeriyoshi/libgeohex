@@ -6,12 +6,17 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(unity)
 
+# Add this line to enable double precision support for Unity
+target_compile_definitions(unity PUBLIC UNITY_INCLUDE_DOUBLE)
+
 add_executable(test_geohex_static test_geohex.c)
 target_link_libraries(test_geohex_static
     PRIVATE
     geohex_static
     unity
 )
+# Add this line to ensure the test executable also has the definition
+target_compile_definitions(test_geohex_static PRIVATE UNITY_INCLUDE_DOUBLE)
 
 add_executable(test_geohex_shared test_geohex.c)
 target_link_libraries(test_geohex_shared
@@ -19,6 +24,8 @@ target_link_libraries(test_geohex_shared
     geohex_shared
     unity
 )
+# Add this line for the shared test executable as well
+target_compile_definitions(test_geohex_shared PRIVATE UNITY_INCLUDE_DOUBLE)
 
 add_test(NAME test_geohex_static COMMAND test_geohex_static)
 add_test(NAME test_geohex_shared COMMAND test_geohex_shared)

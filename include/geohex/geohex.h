@@ -24,18 +24,19 @@ extern "C" {
 
 typedef char geohex_code_t[GEOHEX_CODE_LENGTH];
 
-typedef struct _latlon_t {
+typedef struct _loc_t {
     double lat;
     double lon;
-} latlon_t;
+} loc_t;
 
 typedef struct _xy_t {
-    uint32_t x;
-    uint32_t y;
+    double x;
+    double y;
+    bool rev;
 } xy_t;
 
 typedef struct _zone_t {
-    latlon_t latlon;
+    loc_t latlon;
     xy_t xy;
     geohex_code_t code;
 } zone_t;
@@ -45,7 +46,7 @@ bool get_zone_by_code(const geohex_code_t code, zone_t *out);
 bool get_xy_by_location(double lat, double lon, uint32_t level, xy_t *out);
 bool get_xy_by_code(const geohex_code_t code, xy_t *out);
 bool get_zone_by_xy(const xy_t xy, uint32_t level, zone_t *out);
-bool adjust_xy(uint32_t x, uint32_t y, uint32_t level, xy_t *out);
+bool adjust_xy(double x, double y, uint32_t level, xy_t *out);
 
 #ifdef __cplusplus
 }
