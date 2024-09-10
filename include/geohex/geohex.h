@@ -41,12 +41,12 @@ typedef struct _zone_t {
     geohex_code_t code;
 } zone_t;
 
-bool get_zone_by_location(double lat, double lng, uint32_t level, zone_t *out);
-bool get_zone_by_code(const geohex_code_t code, zone_t *out);
-bool get_xy_by_location(double lat, double lon, uint32_t level, xy_t *out);
-bool get_xy_by_code(const geohex_code_t code, xy_t *out);
-bool get_zone_by_xy(const xy_t xy, uint32_t level, zone_t *out);
 bool adjust_xy(double x, double y, uint32_t level, xy_t *out);
+bool get_xy_by_location(const loc_t *location, uint32_t level, xy_t *out);
+bool get_xy_by_code(const geohex_code_t code, xy_t *out);
+bool get_zone_by_location(const loc_t *locaction, uint32_t level, zone_t *out);
+bool get_zone_by_code(const geohex_code_t code, zone_t *out);
+bool get_zone_by_xy(const xy_t *xy, uint32_t level, zone_t *out);
 
 #ifdef __cplusplus
 }
