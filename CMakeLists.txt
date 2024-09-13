@@ -4,13 +4,12 @@ project(libgeohex VERSION 1.0.0 LANGUAGES C)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
-option(BUILD_TESTS "Build tests" ON)
-option(USE_VALGRIND "Enable Valgrind memory checks" OFF)
+option(BUILD_TESTS "Build tests" OFF)
 
 option(USE_ASAN "Enable AddressSanitizer" OFF)
 option(USE_UBSAN "Enable UndefinedBehaviorSanitizer" OFF)
 option(USE_MSAN "Enable MemorySanitizer" OFF)
-option(USE_COVERAGE "Enable code coverage with gcov" OFF)
+option(USE_COVERAGE "Enable code coverage" OFF)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 
@@ -42,7 +41,7 @@ if(USE_ASAN)
 endif()
 
 if(USE_UBSAN)
-    set(SANITIZER_FLAGS "${SANITIZER_FLAGS} -fsanitize=undefined")
+    set(SANITIZER_FLAGS "${SANITIZER_FLAGS} -fsanitize=undefined -fno-omit-frame-pointer")
 endif()
 
 if(USE_MSAN)
@@ -74,28 +73,3 @@ if(BUILD_TESTS)
     add_subdirectory(tests)
 endif()
 
-find_program(VALGRIND "valgrind")
-if(NOT VALGRIND)
-    message(STATUS "Valgrind not found, memory check target will not be available")
-endif()
-
-if(USE_COVERAGE)
-    find_program(GCOV "gcov")
-    if(NOT GCOV)
-        message(FATAL_ERROR "gcov not found, but code coverage is enabled")
-    endif()
-
-    find_program(LCOV "lcov")
-    find_program(GENHTML "genhtml")
-    if(LCOV AND GENHTML)
-        add_custom_target(coverage
-            COMMAND ${LCOV} --directory . --capture --output-file coverage.info
-            COMMAND ${LCOV} --remove coverage.info '/usr/*' --output-file coverage.info
-            COMMAND ${GENHTML} coverage.info --output-directory coverage_report
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-            COMMENT "Generating code coverage report"
-        )
-    else()
-        message(STATUS "lcov or genhtml not found, HTML coverage report generation will not be available")
-    endif()
-endif()
