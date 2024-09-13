@@ -73,7 +73,3 @@ if(BUILD_TESTS)
     add_subdirectory(tests)
 endif()
 
-find_program(VALGRIND "valgrind")
-if(NOT VALGRIND)
-    message(STATUS "Valgrind not found, memory check target will not be available")
-endif()

@@ -31,6 +31,7 @@ jobs:
               --privileged \
               --cap-add SYS_ADMIN \
               --security-opt seccomp:unconfined \
+              -e NATIVE_PLATFORM="${{ matrix.platform }}" \
               -v "$(pwd):/workspaces/libgeohex" \
               -w "/workspaces/libgeohex" \
               -i "test" \

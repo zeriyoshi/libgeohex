@@ -19,14 +19,14 @@ build_and_test() {
 }
 
 build_and_test "clang" false false false
-if test "x${PLATFORM}" != "xlinux/s390x"; then
+if test "x${NATIVE_PLATFORM}" = "x" || test "x${PLATFORM}" != "xlinux/s390x" && test "x${PLATFORM}" = "x${NATIVE_PLATFORM}"; then
   build_and_test "clang" true false false
   build_and_test "clang" false true false
   build_and_test "clang" false false true
 fi
 
 build_and_test "gcc" false false false
-if test "x${PLATFORM}" != "xlinux/s390x"; then
+if test "x${NATIVE_PLATFORM}" = "x" || test "x${PLATFORM}" != "xlinux/s390x" && test "x${PLATFORM}" = "x${NATIVE_PLATFORM}"; then
   build_and_test "gcc" true false false
   build_and_test "gcc" false true false
 fi
