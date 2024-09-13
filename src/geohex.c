@@ -131,7 +131,7 @@ bool get_xy_by_code(const geohex_code_t code, xy_t *out) {
     char *ptr_c2 = strchr(GEOHEX_KEY, code[1]);
     if (!ptr_c1 || !ptr_c2) return false;
 
-    int code3 = (ptr_c1 - GEOHEX_KEY) * 30 + (ptr_c2 - GEOHEX_KEY);
+    int32_t code3 = (ptr_c1 - GEOHEX_KEY) * 30 + (ptr_c2 - GEOHEX_KEY);
     char h_dec9[64];
     snprintf(h_dec9, sizeof(h_dec9), "%d%s", code3, code + 2);
 
@@ -141,8 +141,8 @@ bool get_xy_by_code(const geohex_code_t code, xy_t *out) {
         h_dec9[0] = (h_dec9[0] == '5') ? '7' : '3';
     }
 
-    int d9xlen = strlen(h_dec9);
-    int target_len = level + 3;
+    int32_t d9xlen = strlen(h_dec9);
+    int32_t target_len = level + 3;
     while (d9xlen < target_len) {
         memmove(h_dec9 + 1, h_dec9, d9xlen + 1);
         h_dec9[0] = '0';
@@ -151,25 +151,25 @@ bool get_xy_by_code(const geohex_code_t code, xy_t *out) {
 
     char h_dec3[128] = {0};
     const char *base9_to_base3[9] = {"00", "01", "02", "10", "11", "12", "20", "21", "22"};
-    int idx = 0;
+    int32_t idx = 0;
 
-    for (int i = 0; i < d9xlen; i++) {
-        int digit = h_dec9[i] - '0';
+    for (int32_t i = 0; i < d9xlen; i++) {
+        int32_t digit = h_dec9[i] - '0';
         h_dec3[idx++] = base9_to_base3[digit][0];
         h_dec3[idx++] = base9_to_base3[digit][1];
     }
     h_dec3[idx] = '\0';
 
-    int h_decx_len = idx / 2;
+    int32_t h_decx_len = idx / 2;
     char h_decx[64], h_decy[64];
-    for (int i = 0; i < h_decx_len; i++) {
+    for (int32_t i = 0; i < h_decx_len; i++) {
         h_decx[i] = h_dec3[2 * i];
         h_decy[i] = h_dec3[2 * i + 1];
     }
     h_decx[h_decx_len] = '\0';
     h_decy[h_decx_len] = '\0';
 
-    for (int i = 0; i <= level + 2; i++) {
+    for (int32_t i = 0; i <= level + 2; i++) {
         double h_pow = pow(3.0, level + 2 - i);
         if (h_decx[i] == '0') h_x -= h_pow;
         else if (h_decx[i] == '2') h_x += h_pow;
@@ -236,11 +236,11 @@ bool get_zone_by_xy(const xy_t *xy, uint32_t level, zone_t *out) {
         z_loc_x = -180.0;
     }
 
-    int code3_len = level + 3;
-    int code3_x[code3_len], code3_y[code3_len];
+    int32_t code3_len = level + 3;
+    int32_t code3_x[code3_len], code3_y[code3_len];
     double mod_x = h_x, mod_y = h_y;
 
-    for (int i = 0; i <= level + 2; i++) {
+    for (int32_t i = 0; i <= level + 2; i++) {
         double h_pow = pow(3.0, level + 2 - i);
         double half_h_pow = ceil(h_pow / 2.0);
 
@@ -278,15 +278,17 @@ bool get_zone_by_xy(const xy_t *xy, uint32_t level, zone_t *out) {
     }
 
     char h_code[64] = {0};
-    for (int i = 0; i <= level + 2; i++) {
-        int code3_int = code3_x[i] * 3 + code3_y[i];
-        char code9 = '0' + code3_int;
+    for (int32_t i = 0; i <= level + 2; i++) {
+        int32_t code3_int32_t = code3_x[i] * 3 + code3_y[i];
+        char code9 = '0' + code3_int32_t;
         strncat(h_code, &code9, 1);
     }
 
-    int h_1_int = atoi(strndup(h_code, 3));
-    int h_a1 = h_1_int / 30;
-    int h_a2 = h_1_int % 30;
+    char h_1_str[4] = {0};
+    strncpy(h_1_str, h_code, 3);
+    int32_t h_1_int32_t = atoi(h_1_str);
+    int32_t h_a1 = h_1_int32_t / 30;
+    int32_t h_a2 = h_1_int32_t % 30;
 
     out->code[0] = GEOHEX_KEY[h_a1];
     out->code[1] = GEOHEX_KEY[h_a2];

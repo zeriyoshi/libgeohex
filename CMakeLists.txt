@@ -41,7 +41,7 @@ if(USE_ASAN)
 endif()
 
 if(USE_UBSAN)
-    set(SANITIZER_FLAGS "${SANITIZER_FLAGS} -fsanitize=undefined")
+    set(SANITIZER_FLAGS "${SANITIZER_FLAGS} -fsanitize=undefined -fno-omit-frame-pointer")
 endif()
 
 if(USE_MSAN)

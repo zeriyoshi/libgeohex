@@ -96,8 +96,8 @@ void test_get_zone_by_xy(void)
         xy_t xy = {
             .x = xy2hex_data[i].x,
             .y = xy2hex_data[i].y,
+            .rev = false,
         };
-        int32_t x, y;
 
         TEST_ASSERT_TRUE(get_zone_by_xy(&xy, xy2hex_data[i].level, &out));
         TEST_ASSERT_EQUAL_STRING(xy2hex_data[i].code, out.code);
