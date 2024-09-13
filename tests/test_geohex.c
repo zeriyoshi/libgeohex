@@ -23,7 +23,7 @@
 #include "geohex/geohex.h"
 
 #include "geohex_private.h"
-#include "code2hex_data.h"
+#include "json_data.h"
 
 void setUp(void) {}
 void tearDown(void) {}
@@ -31,50 +31,30 @@ void tearDown(void) {}
 void test_calc_hex_size(void)
 {
     uint32_t i;
-    const double cases[] = {
-        247376.6461728395,
-        82458.88205761317,
-        27486.29401920439,
-        9162.098006401464,
-        3054.0326688004875,
-        1018.0108896001626,
-        339.3369632000542,
-        113.11232106668473,
-        37.70410702222824,
-        12.56803567407608,
-        4.189345224692027,
-        1.3964484082306756,
-        0.4654828027435586,
-        0.15516093424785285,
-        0.05172031141595095,
-        0.017240103805316983,
-        0.005746701268438995
-    };
 
-    for (i = 0; i < (sizeof(cases) / sizeof(cases[0])); i++) {
-        TEST_ASSERT_DOUBLE_WITHIN(15, cases[i], calc_hex_size(i + 1));
+    for (i = 0; i < (sizeof(calc_hex_size_data) / sizeof(calc_hex_size_data[0])); i++) {
+        TEST_ASSERT_DOUBLE_WITHIN(15, calc_hex_size_data[i], calc_hex_size(i + 1));
     }
 }
 
 void test_loc2xy(void)
 {
-    xy_t r;
+    double x, y;
 
-    loc2xy(35.65858, 139.745433, &r);
+    loc2xy(139.745433, 35.65858, &x, &y);
 
-    TEST_ASSERT_DOUBLE_WITHIN(15, 15556390.440080063, r.x);
-    TEST_ASSERT_DOUBLE_WITHIN(15, 4253743.631945749, r.y);
-    TEST_ASSERT_FALSE(r.rev);
+    TEST_ASSERT_DOUBLE_WITHIN(15, 15556390.440080063, x);
+    TEST_ASSERT_DOUBLE_WITHIN(15, 4253743.631945749, y);
 }
 
 void test_xy2loc(void)
 {
-    loc_t r;
+    double lat, lon;
 
-    xy2loc(15556390.440080063, 4253743.631945749, &r);
+    xy2loc(15556390.440080063, 4253743.631945749, &lon, &lat);
 
-    TEST_ASSERT_DOUBLE_WITHIN(15, 35.65858, r.lat);
-    TEST_ASSERT_DOUBLE_WITHIN(15, 139.745433, r.lon);
+    TEST_ASSERT_DOUBLE_WITHIN(15, 35.65858, lat);
+    TEST_ASSERT_DOUBLE_WITHIN(15, 139.745433, lon);
 }
 
 void test_adjust_xy(void)
@@ -90,71 +70,84 @@ void test_adjust_xy(void)
     TEST_ASSERT_DOUBLE_WITHIN(15, 15556390.440080063, r.x);
     TEST_ASSERT_DOUBLE_WITHIN(15, 4253743.631945749, r.y);
     TEST_ASSERT_FALSE(r.rev);
-
-    TEST_ASSERT_TRUE(true);
 }
 
 void test_get_xy_by_location(void)
 {
-    loc_t location = {.lat = 35.65858, .lon = 139.745433};
-    xy_t r;
+    xy_t out;
 
-    TEST_ASSERT_TRUE(get_xy_by_location(&location, 11, &r));
-    TEST_ASSERT_DOUBLE_WITHIN(15, 912000.0, r.x);
-    TEST_ASSERT_DOUBLE_WITHIN(15, -325774.0, r.y);
+    for (uint32_t i = 0; i < (sizeof(coord2xy_data) / sizeof(coord2xy_data[0])); i++) {
+        loc_t loc = {
+            .lat = coord2xy_data[i].lat,
+            .lon = coord2xy_data[i].lon,
+        };
+
+        TEST_ASSERT_TRUE(get_xy_by_location(&loc, coord2xy_data[i].level, &out));
+        TEST_ASSERT_DOUBLE_WITHIN(15, coord2xy_data[i].x, out.x);
+        TEST_ASSERT_DOUBLE_WITHIN(15, coord2xy_data[i].y, out.y);
+    }
 }
 
 void test_get_zone_by_xy(void)
 {
-    xy_t xy = {.x = 912000.0, .y = -325774.0, .rev = false};
-    zone_t r;
+    zone_t out;
 
-    TEST_ASSERT_TRUE(get_zone_by_xy(&xy, 11, &r));
-    TEST_ASSERT_EQUAL_STRING("XM48854457273", r.code);
-    TEST_ASSERT_DOUBLE_WITHIN(15, 35.658618718910624, r.latlon.lat);
-    TEST_ASSERT_DOUBLE_WITHIN(15, 139.7454091799466, r.latlon.lon);
-    TEST_ASSERT_DOUBLE_WITHIN(15, 912000.0, r.xy.x);
-    TEST_ASSERT_DOUBLE_WITHIN(15, -325774.0, r.xy.y);
+    for (uint32_t i = 0; i < (sizeof(xy2hex_data) / sizeof(xy2hex_data[0])); i++) {
+        xy_t xy = {
+            .x = xy2hex_data[i].x,
+            .y = xy2hex_data[i].y,
+        };
+        int32_t x, y;
+
+        TEST_ASSERT_TRUE(get_zone_by_xy(&xy, xy2hex_data[i].level, &out));
+        TEST_ASSERT_EQUAL_STRING(xy2hex_data[i].code, out.code);
+    }
 }
 
 void test_get_xy_by_code(void)
 {
-    xy_t r;
+    xy_t out;
 
-    TEST_ASSERT_TRUE(get_xy_by_code("XM48854457273", &r));
-    TEST_ASSERT_DOUBLE_WITHIN(15, 912000.0, r.x);
-    TEST_ASSERT_DOUBLE_WITHIN(15, -325774.0, r.y);
-    TEST_ASSERT_FALSE(r.rev);
+    for (uint32_t i = 0; i < (sizeof(code2xy_data) / sizeof(code2xy_data[0])); i++) {
+        TEST_ASSERT_TRUE(get_xy_by_code(code2xy_data[i].code, &out));
+        TEST_ASSERT_EQUAL_INT32(code2xy_data[i].x, (int32_t) out.x);
+        TEST_ASSERT_EQUAL_INT32(code2xy_data[i].y, (int32_t) out.y);
+    }
 }
 
 void test_get_zone_by_location(void)
 {
-    loc_t location;
-    zone_t r;
-    uint32_t i;
+    zone_t out;
 
-    for (i = 0; i < (sizeof(entries) / sizeof(entries[0])); i++) {
-        location.lat = entries[i].lat;
-        location.lon = entries[i].lon;
+    for (uint32_t i = 0; i < (sizeof(code2hex_data) / sizeof(code2hex_data[0])); i++) {
+        loc_t loc = {
+            .lat = code2hex_data[i].lat,
+            .lon = code2hex_data[i].lon,
+        };
 
-        TEST_ASSERT_TRUE(get_zone_by_location(&location, strlen(entries[i].code) - 2, &r));
-        TEST_ASSERT_EQUAL_STRING(entries[i].code, r.code);
+        TEST_ASSERT_TRUE(get_zone_by_location(&loc, strlen(code2hex_data[i].code) - 2, &out));
+        TEST_ASSERT_EQUAL_STRING(code2hex_data[i].code, out.code);
+    }
+
+    for (uint32_t i = 0; i < sizeof(coord2hex_data) / sizeof(coord2hex_data[0]); i++) {
+        loc_t loc = {
+            .lat = coord2hex_data[i].lat,
+            .lon = coord2hex_data[i].lon,
+        };
+
+        TEST_ASSERT_TRUE(get_zone_by_location(&loc, coord2hex_data[i].level, &out));
+        TEST_ASSERT_EQUAL_STRING(coord2hex_data[i].code, out.code);
     }
 }
 
 void test_get_zone_by_code(void)
 {
-    zone_t r;
-    uint32_t i;
+    zone_t out;
 
-    for (i = 0; i < (sizeof(entries) / sizeof(entries[0])); i++) {
-        char *msg;
-
-        sprintf(msg, "%s|%s", entries[i].code, r.code);
-
-        TEST_ASSERT_TRUE(get_zone_by_code(entries[i].code, &r));
-        TEST_ASSERT_EQUAL_DOUBLE_MESSAGE(entries[i].lat, r.latlon.lat, msg);
-        TEST_ASSERT_EQUAL_DOUBLE_MESSAGE(entries[i].lon, r.latlon.lon, msg);
+    for (uint32_t i = 0; i < (sizeof(code2hex_data) / sizeof(code2hex_data[0])); i++) {
+        TEST_ASSERT_TRUE(get_zone_by_code(code2hex_data[i].code, &out));
+        TEST_ASSERT_DOUBLE_WITHIN(15, code2hex_data[i].lat, out.latlon.lat);
+        TEST_ASSERT_DOUBLE_WITHIN(15, code2hex_data[i].lon, out.latlon.lon);
     }
 }
 

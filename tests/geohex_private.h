@@ -16,7 +16,7 @@
 #include <stdint.h>
 
 double calc_hex_size(uint32_t level);
-void loc2xy(double lat, double lon, xy_t *out);
-void xy2loc(double x, double y, loc_t *out);
+void loc2xy(double lon, double lat, double *x, double *y);
+void xy2loc(double x, double y, double *lon, double *lat);
 
 #endif /* GEOHEX_PRIVATE_H */
