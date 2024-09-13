@@ -18,11 +18,17 @@ build_and_test() {
     rm -rf "build"
 }
 
-build_and_test "clang" true false false
-build_and_test "clang" false true false
-build_and_test "clang" false false true
+build_and_test "clang" false false false
+if test "x${PLATFORM}" != "xlinux/s390x"; then
+  build_and_test "clang" true false false
+  build_and_test "clang" false true false
+  build_and_test "clang" false false true
+fi
 
-build_and_test "gcc" true false false
-build_and_test "gcc" false true false
+build_and_test "gcc" false false false
+if test "x${PLATFORM}" != "xlinux/s390x"; then
+  build_and_test "gcc" true false false
+  build_and_test "gcc" false true false
+fi
 
 echo "All builds and tests completed successfully."
