@@ -39,12 +39,12 @@ void test_calc_hex_size(void)
 
 void test_loc2xy(void)
 {
-    double x, y;
+    double dx, dy;
 
-    loc2xy(139.745433, 35.65858, &x, &y);
+    loc2xy(139.745433, 35.65858, &dx, &dy);
 
-    TEST_ASSERT_DOUBLE_WITHIN(15, 15556390.440080063, x);
-    TEST_ASSERT_DOUBLE_WITHIN(15, 4253743.631945749, y);
+    TEST_ASSERT_DOUBLE_WITHIN(15, 15556390.440080063, dx);
+    TEST_ASSERT_DOUBLE_WITHIN(15, 4253743.631945749, dy);
 }
 
 void test_xy2loc(void)
@@ -59,17 +59,17 @@ void test_xy2loc(void)
 
 void test_adjust_xy(void)
 {
-    xy_t r;
+    xy_t xy;
 
-    adjust_xy(15556390.440080063, 4253743.631945749, 1, &r);
-    TEST_ASSERT_DOUBLE_WITHIN(15, 15556363.440080062, r.x);
-    TEST_ASSERT_DOUBLE_WITHIN(15, 4253770.63194575, r.y);
-    TEST_ASSERT_FALSE(r.rev);
+    adjust_xy(15556390, 4253743, 1, &xy);
+    TEST_ASSERT_EQUAL_INT32(15556363, xy.x);
+    TEST_ASSERT_EQUAL_INT32(4253770, xy.y);
+    TEST_ASSERT_FALSE(xy.rev);
 
-    adjust_xy(15556390.440080063, 4253743.631945749, 17, &r);
-    TEST_ASSERT_DOUBLE_WITHIN(15, 15556390.440080063, r.x);
-    TEST_ASSERT_DOUBLE_WITHIN(15, 4253743.631945749, r.y);
-    TEST_ASSERT_FALSE(r.rev);
+    adjust_xy(15556390, 4253743, 17, &xy);
+    TEST_ASSERT_EQUAL_INT32(15556390, xy.x);
+    TEST_ASSERT_EQUAL_INT32(4253743, xy.y);
+    TEST_ASSERT_FALSE(xy.rev);
 }
 
 void test_get_xy_by_location(void)
@@ -110,8 +110,8 @@ void test_get_xy_by_code(void)
 
     for (uint32_t i = 0; i < (sizeof(code2xy_data) / sizeof(code2xy_data[0])); i++) {
         TEST_ASSERT_TRUE(get_xy_by_code(code2xy_data[i].code, &out));
-        TEST_ASSERT_EQUAL_INT32(code2xy_data[i].x, (int32_t) out.x);
-        TEST_ASSERT_EQUAL_INT32(code2xy_data[i].y, (int32_t) out.y);
+        TEST_ASSERT_EQUAL_INT32(code2xy_data[i].x, out.x);
+        TEST_ASSERT_EQUAL_INT32(code2xy_data[i].y, out.y);
     }
 }
 

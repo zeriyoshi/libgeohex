@@ -20,20 +20,25 @@
 extern "C" {
 #endif
 
-#define LIBGEOHEX_VERSION "1.0.0"
-#define GEOHEX_COMPLIANT_VERSION "3.2"
-#define GEOHEX_CODE_LENGTH 18
+#define LIBGEOHEX_VERSION           "1.1.0"
+#define GEOHEX_COMPLIANT_VERSION    "3.2"
 
-typedef char geohex_code_t[GEOHEX_CODE_LENGTH];
+#define MAX_LEVEL       15
+#define MAX_CODE_LEN    (MAX_LEVEL + 3)
+#define MAX_H_DEC9_LEN  (4 + MAX_LEVEL)
+#define MAX_H_DEC3_LEN  (MAX_H_DEC9_LEN * 2)
+#define MAX_H_CODE_LEN  (MAX_CODE_LEN + 1)
+
+typedef char geohex_code_t[MAX_CODE_LEN + 2];
 
 typedef struct {
-    double lat;
     double lon;
+    double lat;
 } loc_t;
 
 typedef struct {
-    double x;
-    double y;
+    int32_t x;
+    int32_t y;
     bool rev;
 } xy_t;
 
@@ -43,7 +48,7 @@ typedef struct {
     geohex_code_t code;
 } zone_t;
 
-bool adjust_xy(double x, double y, uint32_t level, xy_t *out);
+bool adjust_xy(int32_t x, int32_t y, uint32_t level, xy_t *out);
 bool get_xy_by_location(const loc_t *location, uint32_t level, xy_t *out);
 bool get_xy_by_code(const geohex_code_t code, xy_t *out);
 bool get_zone_by_location(const loc_t *location, uint32_t level, zone_t *out);

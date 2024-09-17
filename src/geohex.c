@@ -28,48 +28,48 @@ double calc_hex_size(uint32_t level) {
     return H_BASE / pow(3.0, level + 3);
 }
 
-void loc2xy(double lon, double lat, double *x, double *y) {
-    *x = lon * H_BASE / 180.0;
-    *y = log(tan((90.0 + lat) * M_PI / 360.0)) * (H_BASE / M_PI);
+void loc2xy(double lon, double lat, double *dx, double *dy) {
+    *dx = lon * H_BASE / 180.0;
+    *dy = log(tan((90.0 + lat) * M_PI / 360.0)) * (H_BASE / M_PI);
 }
 
-void xy2loc(double x, double y, double *lon, double *lat) {
-    *lon = (x / H_BASE) * 180.0;
-    *lat = (y / H_BASE) * 180.0;
+void xy2loc(double dx, double dy, double *lon, double *lat) {
+    *lon = (dx / H_BASE) * 180.0;
+    *lat = (dy / H_BASE) * 180.0;
     *lat = 180.0 / M_PI * (2.0 * atan(exp(*lat * M_PI / 180.0)) - M_PI / 2.0);
 }
 
-bool adjust_xy(double x, double y, uint32_t level, xy_t *out) {
+bool adjust_xy(int32_t x, int32_t y, uint32_t level, xy_t *out) {
     if (!out) {
         return false;
     }
 
-    double max_hsteps = pow(3.0, level + 2);
-    double hsteps = fabs(x - y);
+    int32_t max_hsteps = (int32_t) pow(3.0, level + 2);
+    int32_t hsteps = abs(x - y);
     bool rev = false;
 
     if (hsteps == max_hsteps && x > y) {
-        double tmp = x;
+        int32_t tmp = x;
         x = y;
         y = tmp;
         rev = true;
     } else if (hsteps > max_hsteps) {
-        double dif = hsteps - max_hsteps;
-        double dif_x = floor(dif / 2.0);
-        double dif_y = dif - dif_x;
+        int32_t dif = hsteps - max_hsteps;
+        int32_t dif_x = (int32_t) floor(dif / 2.0);
+        int32_t dif_y = dif - dif_x;
 
         if (x > y) {
-            double edge_x = x - dif_x;
-            double edge_y = y + dif_y;
-            double temp = edge_x;
+            int32_t edge_x = x - dif_x;
+            int32_t edge_y = y + dif_y;
+            int32_t temp = edge_x;
             edge_x = edge_y;
             edge_y = temp;
             x = edge_x + dif_x;
             y = edge_y - dif_y;
         } else if (y > x) {
-            double edge_x = x + dif_x;
-            double edge_y = y - dif_y;
-            double temp = edge_x;
+            int32_t edge_x = x + dif_x;
+            int32_t edge_y = y - dif_y;
+            int32_t temp = edge_x;
             edge_x = edge_y;
             edge_y = temp;
             x = edge_x - dif_x;
@@ -98,21 +98,21 @@ bool get_xy_by_location(const loc_t *location, uint32_t level, xy_t *out) {
     double h_pos_x = (lon_grid + lat_grid / H_K) / unit_x;
     double h_pos_y = (lat_grid - H_K * lon_grid) / unit_y;
 
-    double h_x = round(h_pos_x);
-    double h_y = round(h_pos_y);
+    int32_t h_x = (int32_t) round(h_pos_x);
+    int32_t h_y = (int32_t) round(h_pos_y);
 
     double h_x_q = h_pos_x - floor(h_pos_x);
     double h_y_q = h_pos_y - floor(h_pos_y);
 
     if (h_y_q > -h_x_q + 1) {
         if (h_y_q < 2 * h_x_q && h_y_q > 0.5 * h_x_q) {
-            h_x = floor(h_pos_x) + 1;
-            h_y = floor(h_pos_y) + 1;
+            h_x = ((int32_t) floor(h_pos_x)) + 1;
+            h_y = ((int32_t) floor(h_pos_y)) + 1;
         }
     } else if (h_y_q < -h_x_q + 1) {
         if (h_y_q > 2 * h_x_q - 1 && h_y_q < 0.5 * h_x_q + 0.5) {
-            h_x = floor(h_pos_x);
-            h_y = floor(h_pos_y);
+            h_x = (int32_t) floor(h_pos_x);
+            h_y = (int32_t) floor(h_pos_y);
         }
     }
 
@@ -125,11 +125,14 @@ bool get_xy_by_code(const geohex_code_t code, xy_t *out) {
     }
 
     uint32_t level = strlen(code) - 2;
-    double h_x = 0, h_y = 0;
+    int32_t h_x = 0, h_y = 0;
 
     char *ptr_c1 = strchr(GEOHEX_KEY, code[0]);
     char *ptr_c2 = strchr(GEOHEX_KEY, code[1]);
-    if (!ptr_c1 || !ptr_c2) return false;
+
+    if (!ptr_c1 || !ptr_c2)  {
+        return false;
+    }
 
     int32_t code3 = (ptr_c1 - GEOHEX_KEY) * 30 + (ptr_c2 - GEOHEX_KEY);
     char h_dec9[64];
@@ -170,12 +173,19 @@ bool get_xy_by_code(const geohex_code_t code, xy_t *out) {
     h_decy[h_decx_len] = '\0';
 
     for (int32_t i = 0; i <= level + 2; i++) {
-        double h_pow = pow(3.0, level + 2 - i);
-        if (h_decx[i] == '0') h_x -= h_pow;
-        else if (h_decx[i] == '2') h_x += h_pow;
+        int32_t h_pow = (int32_t) pow(3.0, level + 2 - i);
 
-        if (h_decy[i] == '0') h_y -= h_pow;
-        else if (h_decy[i] == '2') h_y += h_pow;
+        if (h_decx[i] == '0') {
+            h_x -= h_pow;
+        } else if (h_decx[i] == '2') {
+            h_x += h_pow;
+        }
+
+        if (h_decy[i] == '0') {
+            h_y -= h_pow;
+        } else if (h_decy[i] == '2') {
+            h_y += h_pow;
+        }
     }
 
     return adjust_xy(h_x, h_y, level, out);
@@ -217,7 +227,7 @@ bool get_zone_by_xy(const xy_t *xy, uint32_t level, zone_t *out) {
     }
 
     double h_size = calc_hex_size(level);
-    double h_x = xy->x, h_y = xy->y;
+    int32_t h_x = xy->x, h_y = xy->y;
 
     double unit_x = 6.0 * h_size;
     double unit_y = 6.0 * h_size * H_K;
@@ -228,9 +238,9 @@ bool get_zone_by_xy(const xy_t *xy, uint32_t level, zone_t *out) {
     double z_loc_x, z_loc_y;
     xy2loc(h_lon, h_lat, &z_loc_x, &z_loc_y);
 
-    double max_hsteps = pow(3.0, level + 2);
-    if (fabs(h_x - h_y) == max_hsteps && h_x > h_y) {
-        double tmp = h_x;
+    int32_t max_hsteps = pow(3.0, level + 2);
+    if (abs(h_x - h_y) == max_hsteps && h_x > h_y) {
+        int32_t tmp = h_x;
         h_x = h_y;
         h_y = tmp;
         z_loc_x = -180.0;
@@ -238,11 +248,11 @@ bool get_zone_by_xy(const xy_t *xy, uint32_t level, zone_t *out) {
 
     int32_t code3_len = level + 3;
     int32_t code3_x[code3_len], code3_y[code3_len];
-    double mod_x = h_x, mod_y = h_y;
+    int32_t mod_x = h_x, mod_y = h_y;
 
     for (int32_t i = 0; i <= level + 2; i++) {
-        double h_pow = pow(3.0, level + 2 - i);
-        double half_h_pow = ceil(h_pow / 2.0);
+        int32_t h_pow = (int32_t) pow(3.0, level + 2 - i);
+        int32_t half_h_pow = (int32_t) ceil(h_pow / 2.0);
 
         if (mod_x >= half_h_pow) {
             code3_x[i] = 2;
