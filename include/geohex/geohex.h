@@ -27,9 +27,8 @@ extern "C" {
 #define MAX_CODE_LEN    (MAX_LEVEL + 3)
 #define MAX_H_DEC9_LEN  (4 + MAX_LEVEL)
 #define MAX_H_DEC3_LEN  (MAX_H_DEC9_LEN * 2)
-#define MAX_H_CODE_LEN  (MAX_CODE_LEN + 1)
 
-typedef char geohex_code_t[MAX_CODE_LEN + 2];
+typedef char geohex_code_t[MAX_CODE_LEN];
 
 typedef struct {
     double lon;
