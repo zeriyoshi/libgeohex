@@ -16,7 +16,7 @@
 #include "geohex/geohex.h"
 
 typedef struct _code2hex_entry_t {
-    char code[GEOHEX_CODE_LENGTH];
+    char code[MAX_CODE_LEN];
     double lat;
     double lon;
 } code2hex_entry_t;
@@ -25,7 +25,7 @@ typedef struct _coord2hex_entry_t {
     uint32_t level;
     double lat;
     double lon;
-    char code[GEOHEX_CODE_LENGTH];
+    char code[MAX_CODE_LEN];
 } coord2hex_entry_t;
 
 typedef struct _coord2xy_entry_t {
@@ -37,7 +37,7 @@ typedef struct _coord2xy_entry_t {
 } coord2xy_entry_t;
 
 typedef struct _code2xy_entry_t {
-    char code[GEOHEX_CODE_LENGTH];
+    char code[MAX_CODE_LEN];
     int32_t x;
     int32_t y;
 } code2xy_entry_t;
@@ -46,7 +46,7 @@ typedef struct _xy2hex_entry_t {
     uint32_t level;
     int32_t x;
     int32_t y;
-    char code[GEOHEX_CODE_LENGTH];
+    char code[MAX_CODE_LEN];
 } xy2hex_entry_t;
 
 static const double calc_hex_size_data[] = {
