@@ -12,15 +12,15 @@ jobs:
         platform: ['linux/amd64', 'linux/arm64/v8', 'linux/s390x', 'linux/arm/v7']
     steps:
         - name: Checkout
-          uses: actions/checkout@v4
+          uses: actions/checkout@v6
           with:
             submodules: true
         - name: Setup QEMU
-          uses: docker/setup-qemu-action@v3
+          uses: docker/setup-qemu-action@vce360397dd3f832beb865e1373c09c0e9f86d70a # v4.0.0
           with:
             platforms: "arm64,s390x,arm"
         - name: Setup buildx
-          uses: docker/setup-buildx-action@v3
+          uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
         - name: Build container
           run: |
             docker build --pull --no-cache --build-arg PLATFORM="${{ matrix.platform }}" --tag "test" .
@@ -35,3 +35,29 @@ jobs:
               -w "/workspaces/libgeohex" \
               -i "test" \
               ./ci.sh
+  macOS:
+    runs-on: macos-latest
+    steps:
+        - name: Checkout
+          uses: actions/checkout@v6
+          with:
+            fetch-depth: 1
+        - name: Configure
+          run: cmake -S . -B build -DBUILD_TESTS=ON
+        - name: Build
+          run: cmake --build build --parallel
+        - name: Test
+          run: ctest --test-dir build --output-on-failure
+  Windows:
+    runs-on: windows-latest
+    steps:
+        - name: Checkout
+          uses: actions/checkout@v6
+          with:
+            fetch-depth: 1
+        - name: Configure
+          run: cmake -S . -B build -DBUILD_TESTS=ON
+        - name: Build
+          run: cmake --build build --config Debug --parallel
+        - name: Test
+          run: ctest --test-dir build --build-config Debug --output-on-failure

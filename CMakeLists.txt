@@ -15,6 +15,15 @@ option(BUILD_STATIC_LIBS "Build static libraries" ON)
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 
 set(GEOHEX_TARGETS)
+set(GEOHEX_MATH_LIBRARIES)
+
+if(NOT WIN32)
+    list(APPEND GEOHEX_MATH_LIBRARIES m)
+endif()
+
+if(WIN32)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+endif()
 
 if (BUILD_STATIC_LIBS)
     add_library(geohex_static STATIC
@@ -28,7 +37,10 @@ if (BUILD_STATIC_LIBS)
         $<INSTALL_INTERFACE:include>
     )
 
-    target_link_libraries(geohex_static PUBLIC m)
+    target_compile_definitions(geohex_static PUBLIC GEOHEX_STATIC_DEFINE)
+    if(GEOHEX_MATH_LIBRARIES)
+        target_link_libraries(geohex_static PUBLIC ${GEOHEX_MATH_LIBRARIES})
+    endif()
 
     list(APPEND GEOHEX_TARGETS geohex_static)
 endif()
@@ -39,13 +51,19 @@ if(BUILD_SHARED_LIBS)
     )
 
     set_target_properties(geohex_shared PROPERTIES OUTPUT_NAME geohex)
+    if(WIN32)
+        set_target_properties(geohex_shared PROPERTIES ARCHIVE_OUTPUT_NAME geohex_shared)
+    endif()
 
     target_include_directories(geohex_shared PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
     )
 
-    target_link_libraries(geohex_shared PUBLIC m)
+    target_compile_definitions(geohex_shared PRIVATE GEOHEX_BUILDING_LIBRARY)
+    if(GEOHEX_MATH_LIBRARIES)
+        target_link_libraries(geohex_shared PUBLIC ${GEOHEX_MATH_LIBRARIES})
+    endif()
 
     list(APPEND GEOHEX_TARGETS geohex_shared)
 endif()

@@ -2,7 +2,7 @@
 /*
  * libgeohex
  *
- * Copyright (c)  2024-2026 Go Kudo Kudo (https://github.com/zeriyoshi)
+ * Copyright (c) 2024-2026 Go Kudo Kudo (https://github.com/zeriyoshi)
  *
  * GeoHex original implementation by @sa2da (http://twitter.com/sa2da)
  * https://www.geohex.org/

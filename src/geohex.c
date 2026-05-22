@@ -2,7 +2,7 @@
 /*
  * libgeohex
  *
- * Copyright (c)  2024-2026 Go Kudo Kudo (https://github.com/zeriyoshi)
+ * Copyright (c) 2024-2026 Go Kudo Kudo (https://github.com/zeriyoshi)
  *
  * GeoHex original implementation by @sa2da (http://twitter.com/sa2da)
  * https://www.geohex.org/
@@ -21,7 +21,7 @@
 
 #define GEOHEX_KEY  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 #define H_BASE      20037508.34
-#define H_K         0.5773502691896257 /* tan(M_PI / 6.0) */
+#define H_K         0.5773502691896257 /* tan(GEOHEX_PI / 6.0) */
 
 const uint32_t pow3_table[] = {
     1,          /* pow(3, 0) */
@@ -57,22 +57,24 @@ static inline int char_to_index(char c) {
     }
 }
 
-double calc_hex_size(uint32_t level) {
+GEOHEX_API double calc_hex_size(uint32_t level) {
     return H_BASE / pow3_table[level + 3];
 }
 
-void loc2xy(double lon, double lat, double *dx, double *dy) {
+GEOHEX_API void loc2xy(double lon, double lat, double *dx, double *dy) {
     *dx = lon * H_BASE / 180.0;
-    *dy = log(tan((90.0 + lat) * M_PI / 360.0)) * (H_BASE / M_PI);
+    *dy = log(tan((90.0 + lat) * GEOHEX_PI / 360.0)) * (H_BASE / GEOHEX_PI);
 }
 
-void xy2loc(double dx, double dy, double *lon, double *lat) {
+GEOHEX_API void xy2loc(double dx, double dy, double *lon, double *lat) {
+    double lat_rad;
+
     *lon = (dx / H_BASE) * 180.0;
-    double lat_rad = (dy / H_BASE) * M_PI;
-    *lat = (2.0 * atan(exp(lat_rad)) - M_PI / 2.0) * 180.0 / M_PI;
+    lat_rad = (dy / H_BASE) * GEOHEX_PI;
+    *lat = (2.0 * atan(exp(lat_rad)) - GEOHEX_PI / 2.0) * 180.0 / GEOHEX_PI;
 }
 
-bool adjust_xy(int32_t x, int32_t y, uint32_t level, xy_t *out) {
+GEOHEX_API bool adjust_xy(int32_t x, int32_t y, uint32_t level, xy_t *out) {
     int32_t tmp, max_hsteps, hsteps, dif, dif_x, dif_y, edge_x, edge_y;
     bool rev;
 
@@ -120,7 +122,7 @@ bool adjust_xy(int32_t x, int32_t y, uint32_t level, xy_t *out) {
     return true;
 }
 
-bool get_xy_by_location(const loc_t *location, uint32_t level, xy_t *out) {
+GEOHEX_API bool get_xy_by_location(const loc_t *location, uint32_t level, xy_t *out) {
     int32_t h_x, h_y;
     double h_size, lon_grid, lat_grid, unit_x, unit_y, h_pos_x, h_pos_y,
         h_x_q, h_y_q;
@@ -159,7 +161,7 @@ bool get_xy_by_location(const loc_t *location, uint32_t level, xy_t *out) {
     return adjust_xy(h_x, h_y, level, out);
 }
 
-bool get_xy_by_code(const geohex_code_t code, xy_t *out) {
+GEOHEX_API bool get_xy_by_code(const geohex_code_t code, xy_t *out) {
     uint32_t code_len, level;
     int32_t i, h_x, h_y, c1_idx, c2_idx, code3, d9xlen, target_len,
         h_decx[MAX_H_DEC3_LEN] = {0}, h_decy[MAX_H_DEC3_LEN] = {0},
@@ -227,7 +229,7 @@ bool get_xy_by_code(const geohex_code_t code, xy_t *out) {
     return adjust_xy(h_x, h_y, level, out);
 }
 
-bool get_zone_by_location(const loc_t *location, uint32_t level, zone_t *out) {
+GEOHEX_API bool get_zone_by_location(const loc_t *location, uint32_t level, zone_t *out) {
     xy_t xy;
 
     if (!out) {
@@ -241,7 +243,7 @@ bool get_zone_by_location(const loc_t *location, uint32_t level, zone_t *out) {
     return get_zone_by_xy(&xy, level, out);
 }
 
-bool get_zone_by_code(const geohex_code_t code, zone_t *out) {
+GEOHEX_API bool get_zone_by_code(const geohex_code_t code, zone_t *out) {
     xy_t xy;
 
     if (!out) {
@@ -255,8 +257,9 @@ bool get_zone_by_code(const geohex_code_t code, zone_t *out) {
     return get_zone_by_xy(&xy, (strlen(code) - 2), out);
 }
 
-bool get_zone_by_xy(const xy_t *xy, uint32_t level, zone_t *out) {
-    int32_t tmp, i, h_x, h_y, max_hsteps,
+GEOHEX_API bool get_zone_by_xy(const xy_t *xy, uint32_t level, zone_t *out) {
+    uint32_t i;
+    int32_t tmp, h_x, h_y, max_hsteps,
         code3_x[MAX_CODE_LEN + 2], code3_y[MAX_CODE_LEN + 2],
         h_code_digits[MAX_CODE_LEN + 2],
         mod_x, mod_y, h_1_int, h_a1, h_a2,

@@ -2,7 +2,7 @@
 /*
  * libgeohex
  *
- * Copyright (c)  2024-2026 Go Kudo Kudo (https://github.com/zeriyoshi)
+ * Copyright (c) 2024-2026 Go Kudo Kudo (https://github.com/zeriyoshi)
  *
  * GeoHex original implementation by @sa2da (http://twitter.com/sa2da)
  * https://www.geohex.org/
@@ -15,6 +15,8 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+
+#include "geohex/compat.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,12 +49,12 @@ typedef struct {
     geohex_code_t code;
 } zone_t;
 
-bool adjust_xy(int32_t x, int32_t y, uint32_t level, xy_t *out);
-bool get_xy_by_location(const loc_t *location, uint32_t level, xy_t *out);
-bool get_xy_by_code(const geohex_code_t code, xy_t *out);
-bool get_zone_by_location(const loc_t *location, uint32_t level, zone_t *out);
-bool get_zone_by_code(const geohex_code_t code, zone_t *out);
-bool get_zone_by_xy(const xy_t *xy, uint32_t level, zone_t *out);
+GEOHEX_API bool adjust_xy(int32_t x, int32_t y, uint32_t level, xy_t *out);
+GEOHEX_API bool get_xy_by_location(const loc_t *location, uint32_t level, xy_t *out);
+GEOHEX_API bool get_xy_by_code(const geohex_code_t code, xy_t *out);
+GEOHEX_API bool get_zone_by_location(const loc_t *location, uint32_t level, zone_t *out);
+GEOHEX_API bool get_zone_by_code(const geohex_code_t code, zone_t *out);
+GEOHEX_API bool get_zone_by_xy(const xy_t *xy, uint32_t level, zone_t *out);
 
 #ifdef __cplusplus
 }

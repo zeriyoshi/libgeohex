@@ -2,7 +2,7 @@
 /*
  * libgeohex
  *
- * Copyright (c)  2024-2026 Go Kudo Kudo (https://github.com/zeriyoshi)
+ * Copyright (c) 2024-2026 Go Kudo Kudo (https://github.com/zeriyoshi)
  *
  * GeoHex original implementation by @sa2da (http://twitter.com/sa2da)
  * https://www.geohex.org/
@@ -78,10 +78,8 @@ void test_get_xy_by_location(void)
     loc_t loc;
 
     for (uint32_t i = 0; i < (sizeof(coord2xy_data) / sizeof(coord2xy_data[0])); i++) {
-        loc = (loc_t) {
-            .lat = coord2xy_data[i].lat,
-            .lon = coord2xy_data[i].lon,
-        };
+        loc.lat = coord2xy_data[i].lat;
+        loc.lon = coord2xy_data[i].lon;
 
         TEST_ASSERT_TRUE(get_xy_by_location(&loc, coord2xy_data[i].level, &out));
         TEST_ASSERT_DOUBLE_WITHIN(15, coord2xy_data[i].x, out.x);
@@ -95,11 +93,9 @@ void test_get_zone_by_xy(void)
     xy_t xy;
 
     for (uint32_t i = 0; i < (sizeof(xy2hex_data) / sizeof(xy2hex_data[0])); i++) {
-        xy = (xy_t) {
-            .x = xy2hex_data[i].x,
-            .y = xy2hex_data[i].y,
-            .rev = false,
-        };
+        xy.x = xy2hex_data[i].x;
+        xy.y = xy2hex_data[i].y;
+        xy.rev = false;
 
         TEST_ASSERT_TRUE(get_zone_by_xy(&xy, xy2hex_data[i].level, &out));
         TEST_ASSERT_EQUAL_STRING(xy2hex_data[i].code, out.code);
@@ -125,20 +121,16 @@ void test_get_zone_by_location(void)
     uint32_t i;
 
     for (i = 0; i < (sizeof(code2hex_data) / sizeof(code2hex_data[0])); i++) {
-        loc = (loc_t) {
-            .lat = code2hex_data[i].lat,
-            .lon = code2hex_data[i].lon,
-        };
+        loc.lat = code2hex_data[i].lat;
+        loc.lon = code2hex_data[i].lon;
 
         TEST_ASSERT_TRUE(get_zone_by_location(&loc, strlen(code2hex_data[i].code) - 2, &out));
         TEST_ASSERT_EQUAL_STRING(code2hex_data[i].code, out.code);
     }
 
     for (i = 0; i < sizeof(coord2hex_data) / sizeof(coord2hex_data[0]); i++) {
-        loc = (loc_t) {
-            .lat = coord2hex_data[i].lat,
-            .lon = coord2hex_data[i].lon,
-        };
+        loc.lat = coord2hex_data[i].lat;
+        loc.lon = coord2hex_data[i].lon;
 
         TEST_ASSERT_TRUE(get_zone_by_location(&loc, coord2hex_data[i].level, &out));
         TEST_ASSERT_EQUAL_STRING(coord2hex_data[i].code, out.code);
