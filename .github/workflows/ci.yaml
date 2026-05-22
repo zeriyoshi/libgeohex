@@ -6,31 +6,73 @@ on:
   pull_request:
 jobs:
   Linux:
-    runs-on: ubuntu-latest
+    name: Linux (${{ matrix.display_platform }})
+    runs-on: ${{ matrix.runner }}
     strategy:
+      fail-fast: false
       matrix:
-        platform: ['linux/amd64', 'linux/arm64/v8', 'linux/s390x', 'linux/arm/v7']
+        include:
+          - display_platform: linux/amd64
+            platform: linux/amd64
+            runner: ubuntu-24.04
+            native_platform: linux/amd64
+            qemu_platforms: ""
+            run_sanitizers: "true"
+          - display_platform: linux/arm64
+            platform: linux/arm64
+            runner: ubuntu-24.04-arm
+            native_platform: linux/arm64
+            qemu_platforms: ""
+            run_sanitizers: "true"
+          - display_platform: linux/s390x
+            platform: linux/s390x
+            runner: ubuntu-24.04
+            native_platform: linux/amd64
+            qemu_platforms: s390x
+            run_sanitizers: "false"
+          - display_platform: linux/arm/v7
+            platform: linux/arm/v7
+            runner: ubuntu-24.04
+            native_platform: linux/amd64
+            qemu_platforms: arm
+            run_sanitizers: "false"
+          - display_platform: linux/i386
+            platform: linux/386
+            runner: ubuntu-24.04
+            native_platform: linux/amd64
+            qemu_platforms: "386"
+            run_sanitizers: "false"
     steps:
         - name: Checkout
           uses: actions/checkout@v6
           with:
             submodules: true
         - name: Setup QEMU
+          if: matrix.qemu_platforms != ''
           uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a # v4.0.0
           with:
-            platforms: "arm64,s390x,arm"
+            platforms: ${{ matrix.qemu_platforms }}
         - name: Setup buildx
           uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
         - name: Build container
           run: |
-            docker build --pull --no-cache --build-arg PLATFORM="${{ matrix.platform }}" --tag "test" .
+            docker buildx build \
+              --pull \
+              --no-cache \
+              --load \
+              --platform "${{ matrix.platform }}" \
+              --build-arg PLATFORM="${{ matrix.platform }}" \
+              --tag "test" \
+              .
         - name: Test
           run: |
             docker run \
+              --platform "${{ matrix.platform }}" \
               --privileged \
               --cap-add SYS_ADMIN \
               --security-opt seccomp:unconfined \
-              -e NATIVE_PLATFORM="linux/amd64" \
+              -e NATIVE_PLATFORM="${{ matrix.native_platform }}" \
+              -e RUN_SANITIZERS="${{ matrix.run_sanitizers }}" \
               -v "$(pwd):/workspaces/libgeohex" \
               -w "/workspaces/libgeohex" \
               -i "test" \

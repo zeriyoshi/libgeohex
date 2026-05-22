@@ -22,7 +22,7 @@
 extern "C" {
 #endif
 
-#define LIBGEOHEX_VERSION           "1.1.1"
+#define LIBGEOHEX_VERSION           "2.0.0"
 #define GEOHEX_COMPLIANT_VERSION    "3.2"
 
 #define MAX_LEVEL       15
