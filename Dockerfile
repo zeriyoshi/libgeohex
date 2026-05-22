@@ -1,6 +1,6 @@
 ARG PLATFORM=${BUILDPLATFORM:-linux/amd64}
 
-FROM --platform=${PLATFORM} debian:bookworm
+FROM --platform=${PLATFORM} debian:trixie
 
 ARG PLATFORM
 

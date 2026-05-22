@@ -75,9 +75,10 @@ void test_adjust_xy(void)
 void test_get_xy_by_location(void)
 {
     xy_t out;
+    loc_t loc;
 
     for (uint32_t i = 0; i < (sizeof(coord2xy_data) / sizeof(coord2xy_data[0])); i++) {
-        loc_t loc = {
+        loc = (loc_t) {
             .lat = coord2xy_data[i].lat,
             .lon = coord2xy_data[i].lon,
         };
@@ -91,9 +92,10 @@ void test_get_xy_by_location(void)
 void test_get_zone_by_xy(void)
 {
     zone_t out;
+    xy_t xy;
 
     for (uint32_t i = 0; i < (sizeof(xy2hex_data) / sizeof(xy2hex_data[0])); i++) {
-        xy_t xy = {
+        xy = (xy_t) {
             .x = xy2hex_data[i].x,
             .y = xy2hex_data[i].y,
             .rev = false,
@@ -107,8 +109,9 @@ void test_get_zone_by_xy(void)
 void test_get_xy_by_code(void)
 {
     xy_t out;
+    uint32_t i;
 
-    for (uint32_t i = 0; i < (sizeof(code2xy_data) / sizeof(code2xy_data[0])); i++) {
+    for (i = 0; i < (sizeof(code2xy_data) / sizeof(code2xy_data[0])); i++) {
         TEST_ASSERT_TRUE(get_xy_by_code(code2xy_data[i].code, &out));
         TEST_ASSERT_EQUAL_INT32(code2xy_data[i].x, out.x);
         TEST_ASSERT_EQUAL_INT32(code2xy_data[i].y, out.y);
@@ -118,9 +121,11 @@ void test_get_xy_by_code(void)
 void test_get_zone_by_location(void)
 {
     zone_t out;
+    loc_t loc;
+    uint32_t i;
 
-    for (uint32_t i = 0; i < (sizeof(code2hex_data) / sizeof(code2hex_data[0])); i++) {
-        loc_t loc = {
+    for (i = 0; i < (sizeof(code2hex_data) / sizeof(code2hex_data[0])); i++) {
+        loc = (loc_t) {
             .lat = code2hex_data[i].lat,
             .lon = code2hex_data[i].lon,
         };
@@ -129,8 +134,8 @@ void test_get_zone_by_location(void)
         TEST_ASSERT_EQUAL_STRING(code2hex_data[i].code, out.code);
     }
 
-    for (uint32_t i = 0; i < sizeof(coord2hex_data) / sizeof(coord2hex_data[0]); i++) {
-        loc_t loc = {
+    for (i = 0; i < sizeof(coord2hex_data) / sizeof(coord2hex_data[0]); i++) {
+        loc = (loc_t) {
             .lat = coord2hex_data[i].lat,
             .lon = coord2hex_data[i].lon,
         };
@@ -143,8 +148,9 @@ void test_get_zone_by_location(void)
 void test_get_zone_by_code(void)
 {
     zone_t out;
+    uint32_t i;
 
-    for (uint32_t i = 0; i < (sizeof(code2hex_data) / sizeof(code2hex_data[0])); i++) {
+    for (i = 0; i < (sizeof(code2hex_data) / sizeof(code2hex_data[0])); i++) {
         TEST_ASSERT_TRUE(get_zone_by_code(code2hex_data[i].code, &out));
         TEST_ASSERT_DOUBLE_WITHIN(15, code2hex_data[i].lat, out.latlon.lat);
         TEST_ASSERT_DOUBLE_WITHIN(15, code2hex_data[i].lon, out.latlon.lon);
