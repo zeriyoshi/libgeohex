@@ -1,3 +1,7 @@
+# DEPRECATED
+
+This repository is archived, use [`colopl/libgeohex`](https://github.com/colopl/libgeohex) instead.
+
 # libgeohex
 
 GeoHex (https://geohex.org/) v3.2 C99 implementation.
